@@ -1,20 +1,22 @@
 include("simulation.jl")
 using Plots
 
-draw(o::Vector{Body},frames) = begin
+draw(s::Simulation,frames) = begin
     scatter()
-    a = @animate for i in range(1,frames)
-        for j in o
+    a = @animate for i in [1:frames]
+        update!(s)
+        for j in s.bodies
             scatter!([j.position[1]],[j.position[2]],
             markersize=j.radius)
         end
-        update(o)
     end
+    gif(a,"simulation.gif",fps=2)
 end
 
 # test
-# a = Body(0, [0; 0], 0, 1000000000)
-# b = Body(1, [-1; -1], 0, 4)
-# u = [a; b]
-# draw(u,25)
+a = Body(1, [0; 0], 5, 10000000)
+b = Body(1, [-1; -1], 2, 4,[1,1])
+u = [a; b]
+s = Simulation(u,1,0)
+draw(s,25)
 # test
