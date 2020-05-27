@@ -1,5 +1,4 @@
 using LinearAlgebra
-# using Plots
 
 const G = 6.6743e-11
 
@@ -13,68 +12,92 @@ mutable struct Body
     mass::Float64
     velocity::Vector{Float64}
     acceleration::Vector{Float64}
+
     Body(b, p, r, m) = new(b, p, r, m, [0.0; 0.0], [0.0; 0.0])
     Body(b, p, r, m, v) = new(b, p, r, m, v, [0.0; 0.0])
 end
 
 Base.show(io::IO, a::Body) = begin
     return a.movable ?
-        print(io, "Dynamic body:\n  position: $(
-              a.position)\n  radius: $(
-              a.radius)\n  mass: $(
-              a.mass)\n  velocity: $(
-              a.velocity)\n  acceleration: $(
+        print(io, "Dynamic body:\n position: $(
+              a.position)\n radius: $(
+              a.radius)\n mass: $(
+              a.mass)\n velocity: $(
+              a.velocity)\n acceleration: $(
               a.acceleration)") :
-        print(io, "Static body:\n  position: $(
-              a.position)\n  radius: $(
-              a.radius)\n  mass: $(
-              a.mass)\n  velocity: $(
-              a.velocity)\n  acceleration: $(
+        print(io, "Static body:\n position: $(
+              a.position)\n radius: $(
+              a.radius)\n mass: $(
+              a.mass)\n velocity: $(
+              a.velocity)\n acceleration: $(
               a.acceleration)")
 end
 
 """
     update!(a::Body, f::Vector)
 
-Update in place object a based on given force vector.
+Update Body in place based on given force vector.
 """
-update!(a::Body, f::Vector) = begin
+update!(a::Body, f::Vector, Δt) = begin
     if a.movable
         a.acceleration = f ./ a.mass
-        a.velocity += a.acceleration
-        a.position += a.velocity
+        a.velocity += a.acceleration / Δt
+        a.position += a.velocity / Δt
     end
 end
-"""
-    update!(u::Vector{Body})
 
-Update in place all bodies in Array.
-Calculates gravity forces between bodies and updates them.
+mutable struct Simulation
+    bodies::Vector{Body}
+    Δt::Float64
+    collisions::Bool
+end
 """
-update(u::Vector{Body}) = begin
-    masses = getfield.(u, :mass)
-    massesprod = masses .* permutedims(masses)
-    positions = getfield.(u, :position)
-    positionsdif = permutedims(positions) .- positions
-    distances = norm.(positionsdif)
-    distances2 = distances.^2
-    versors = normalize.(positionsdif)
-    forces = G * massesprod .* versors ./ distances2
-    replace!(forces, [NaN, NaN]=>[0.0, 0.0])
-    update.(u, sum(forces, dims=2))
+    which_collide(collisions::BitArray)
+
+Inform if any collisions occur(excluding one with itself).
+"""
+which_collide(collisions::BitArray) = begin
+    for (i, body) in enumerate(eachrow(collisions))
+        for (j, other) in enumerate(body[i+1:end])
+            if other
+                @info i, j+1
+            end
+        end
+    end
 end
 
-# testing
+"""
+    update!(s::Simulation)
 
-# a = Body(0, [0; 0], 0, 1000000000)
-# b = Body(1, [-1; -1], 0, 4)
-# u = [a; b]
-# scatter([a.position[1]], [a.position[2]], framestyle=:origin, color=:black, legend=:none)
-# scatter!([b.position[1]], [b.position[2]], color=:red)
-# for i in 1:15
-#     update(u)
-#     scatter!([b.position[1]], [b.position[2]], color=:red)
-# end
-# plot!()
+Update all bodies in the simulation in place.
+Calculates gravity forces between bodies and updates them.
+Checks for collisions.
+"""
+update!(s::Simulation) = begin
+    masses = getfield.(s.bodies, :mass)
+    masses_product = masses .* permutedims(masses)
 
-# testing
+    positions = getfield.(s.bodies, :position)
+    positions_differences = permutedims(positions) .- positions
+    versors = normalize.(positions_differences)
+
+    distances = norm.(positions_differences)
+    distances_squared = distances.^2
+
+    forces = G * masses_product .* versors ./ distances_squared
+    replace!(forces, [NaN, NaN]=>[0.0; 0.0])
+
+    update!.(s.bodies, sum(forces, dims=2), s.Δt)
+
+    if s.collisions
+        radii = getfield.(s.bodies, :radius)
+        collision_distances = radii .+ permutedims(radii)
+
+        new_positions = getfield.(s.bodies, :position)
+        new_positions_differences = permutedims(new_positions) .- new_positions
+        new_distances = norm.(new_positions_differences)
+
+        collisions = new_distances .< collision_distances
+        which_collide(collisions)
+    end
+end
