@@ -3,17 +3,21 @@ using Plots
 
 draw(s::Simulation,limit) = begin
     wykr = scatter([NaN],[NaN],
-        title="Simulation",
-        xlim=(limit[1], limit[2]),
-        ylim=(limit[3], limit[4]),
-        xlabel="X",
-        ylabel="Y",
+        title = "Simulation",
+        xlim = (limit[1], limit[2]),
+        ylim = (limit[3], limit[4]),
+        xlabel = "X",
+        ylabel = "Y",
         label = :none)
     iter = 1
     for j in s.bodies
         scatter!(wykr,[j.position[1]],[j.position[2]],
             markersize=j.radius,
-            label="Cialo $iter")
+            label = "Body $iter")
+        plot!([j.position[1],j.position[1]+j.velocity[1]],
+        [j.position[2],j.position[2]+j.velocity[2]],
+        arrow = 0.4,
+        label = "v$iter")
         iter += 1
     end
     display(wykr)
@@ -47,16 +51,15 @@ limits(s::Simulation) = begin
     return [minx,maxx,miny,maxy]
 end
 
-
 # test
-a = Body(1, [0; 0], 5, 10000)
+a = Body(1, [0; 0], 5, 10000,[0.5,0])
 b = Body(1, [-1; -1], 2, 4,[1,1])
 u = [a; b]
-s = Simulation(u,0.5,0)
+s = Simulation(u,1,0)
 limit = limits(s)
-for i in 1:5
-    draw(s,[-2,6,-2,6])
+for i in 1:10
+    draw(s,[-2,6,-2,6]) #<= wersja testowa dla sił; docelowo draw(s,limit)
     update!(s)
-    sleep(4)
+    sleep(2)
 end
 # test
