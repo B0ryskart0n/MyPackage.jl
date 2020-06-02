@@ -34,7 +34,7 @@ Base.show(io::IO, a::Body) = begin
 end
 
 """
-    update!(a::Body, f::Vector)
+    update!(a::Body, f::Vector) -> a::Body
 
 Update Body in place based on given force vector.
 """
@@ -44,13 +44,17 @@ update!(a::Body, f::Vector, Δt) = begin
         a.velocity += a.acceleration / Δt
         a.position += a.velocity / Δt
     end
+
+    return a
 end
 
 mutable struct Simulation
     bodies::Vector{Body}
     Δt::Float64
+    timespan::Float64
     collisions::Bool
 end
+
 """
     which_collide(collisions::BitArray)
 
@@ -67,7 +71,7 @@ which_collide(collisions::BitArray) = begin
 end
 
 """
-    update!(s::Simulation)
+    update!(s::Simulation) -> s::Simulation
 
 Update all bodies in the simulation in place.
 Calculates gravity forces between bodies and updates them.
@@ -100,4 +104,24 @@ update!(s::Simulation) = begin
         collisions = new_distances .< collision_distances
         which_collide(collisions)
     end
+
+    return(s)
+end
+
+"""
+    run!(s::Simulation) -> data::Array{Body, 2}
+
+Return the data of bodies collected in each frame of simulation.
+"""
+run!(s::Simulation) = begin
+    num_of_frames = s.timespan / s.Δt |> ceil |> Int
+
+    data = Array{Body, 2}(undef, num_of_frames, length(s.bodies))
+
+    data[1, :] = deepcopy(s.bodies)
+    for i in 2:num_of_frames
+        data[i, :] = deepcopy(update!(s).bodies)
+    end
+
+    return data
 end
