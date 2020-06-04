@@ -123,12 +123,3 @@ run!(s::Simulation) = begin
 
     return data
 end
-
-#test
-a = Body(1, [0; 0], 5, 100000000000, [0, -1])
-b = Body(1, [-5; -5], 2, 5,[0, 0.5])
-c = Body(1, [5; 5], 2, 4,[0, -0.5])
-s = Simulation([a, b, c], 0.01, 1000, 0)
-# @time update!(a)
-# @time update!(S)
-@btime run!(s)
