@@ -34,15 +34,15 @@ Base.show(io::IO, a::Body) = begin
 end
 
 """
-    update!(a::Body, f::Vector) -> a::Body
+    update!(a::Body, f::Vector{Float64}, Δt::Float64) -> a::Body
 
 Update Body in place based on given force vector.
 """
-update!(a::Body, f::Vector, Δt) = begin
+update!(a::Body, f::Vector{Float64}, Δt::Float64) = begin
     if a.movable
         a.acceleration = f ./ a.mass
-        a.velocity += a.acceleration / Δt
-        a.position += a.velocity / Δt
+        a.velocity += a.acceleration * Δt
+        a.position += a.velocity * Δt
     end
 
     return a
@@ -78,34 +78,32 @@ Calculates gravity forces between bodies and updates them.
 Checks for collisions.
 """
 update!(s::Simulation) = begin
-    masses = getfield.(s.bodies, :mass)
-    masses_product = masses .* permutedims(masses)
+    masses::Vector{Float64} = getfield.(s.bodies, :mass)
+    masses_product::Matrix{Float64} = masses .* permutedims(masses)
 
-    positions = getfield.(s.bodies, :position)
-    positions_differences = permutedims(positions) .- positions
+    positions::Vector{Vector{Float64}} = getfield.(s.bodies, :position)
+    positions_differences::Matrix{Vector{Float64}} = permutedims(positions) .- positions
     versors = normalize.(positions_differences)
 
-    distances = norm.(positions_differences)
-    distances_squared = distances.^2
+    distances_squared = norm.(positions_differences).^2
 
-    forces = G * masses_product .* versors ./ distances_squared
-    replace!(forces, [NaN, NaN]=>[0.0; 0.0])
+    forces::Matrix{Vector{Float64}} = G .* masses_product .* versors ./ distances_squared
+    replace!(forces, [NaN; NaN] => [0.0; 0.0])
 
     update!.(s.bodies, sum(forces, dims=2), s.Δt)
 
     if s.collisions
-        radii = getfield.(s.bodies, :radius)
+        radii::Vector{Float64} = getfield.(s.bodies, :radius)
         collision_distances = radii .+ permutedims(radii)
 
-        new_positions = getfield.(s.bodies, :position)
-        new_positions_differences = permutedims(new_positions) .- new_positions
-        new_distances = norm.(new_positions_differences)
+        new_positions::Vector{Vector{Float64}} = getfield.(s.bodies, :position)
+        new_distances::Matrix{Float64} = norm.(permutedims(new_positions) .- new_positions)
 
         collisions = new_distances .< collision_distances
         which_collide(collisions)
     end
 
-    return(s)
+    return s
 end
 
 """
@@ -114,14 +112,23 @@ end
 Return the data of bodies collected in each frame of simulation.
 """
 run!(s::Simulation) = begin
-    num_of_frames = s.timespan / s.Δt |> ceil |> Int
+    num_of_frames = 1 + div(s.timespan, s.Δt) |> Int
 
-    data = Array{Body, 2}(undef, num_of_frames, length(s.bodies))
+    data = Array{Body, 2}(undef, length(s.bodies), num_of_frames)
 
-    data[1, :] = deepcopy(s.bodies)
+    data[:, 1] = deepcopy(s.bodies)
     for i in 2:num_of_frames
-        data[i, :] = deepcopy(update!(s).bodies)
+        data[:, i] = deepcopy(update!(s).bodies)
     end
 
     return data
 end
+
+#test
+a = Body(1, [0; 0], 5, 100000000000, [0, -1])
+b = Body(1, [-5; -5], 2, 5,[0, 0.5])
+c = Body(1, [5; 5], 2, 4,[0, -0.5])
+s = Simulation([a, b, c], 0.01, 1000, 0)
+# @time update!(a)
+# @time update!(S)
+@btime run!(s)
