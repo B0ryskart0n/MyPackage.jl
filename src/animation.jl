@@ -10,9 +10,9 @@ Acquires limits vector in form: [xmin, xmax, ymin, ymax]
 """
 draw(data::Array{Body, 2}, s::Simulation, limits::Vector) = begin
     Δt = s.Δt
-    a = @animate for i in 1:size(data)[1]
+    a = @animate for j in 1:size(data)[2]
         plot()
-        for j in 1:size(data)[2]
+        for i in 1:size(data)[1]
             scatter!([data[i,j].position[1]], [data[i,j].position[2]],
             markersize = data[i,j].radius,
             title = "Simulation",
@@ -20,11 +20,11 @@ draw(data::Array{Body, 2}, s::Simulation, limits::Vector) = begin
             ylim = (limits[3], limits[4]),
             xlabel = "X",
             ylabel = "Y",
-            label = "Body $j")
+            label = "Body $i")
             plot!([data[i,j].position[1],data[i,j].position[1]+data[i,j].velocity[1]],
             [data[i,j].position[2],data[i,j].position[2]+data[i,j].velocity[2]],
             arrow = 0.4,
-            label = "v$j")
+            label = "v$i")
         end
     end
     gif(a, "animation.gif", fps=1/Δt)
@@ -42,30 +42,31 @@ graph(data::Array{Body, 2}, s::Simulation, type::String, time::Vector) = begin
     Δt = s.Δt
     first_frame = ceil(Int,time[1]/Δt)
     last_frame = floor(Int,time[2]/Δt)
-    v = []
-    a = []
+    Δf = last_frame - first_frame + 1
     xs = first_frame*Δt:Δt:last_frame*Δt
-    for i in 1:size(data)[2]
+    v = Array{Float64,2}(undef,Δf,size(data)[1])
+    a = Array{Float64,2}(undef,Δf,size(data)[1])
+    for i in 1:size(data)[1]
         for j in first_frame+1:last_frame+1
-            append!(v,sqrt(data[j,i].velocity[1]^2+data[j,i].velocity[2]^2))
-            append!(a,sqrt(data[j,i].acceleration[1]^2+data[j,i].acceleration[2]^2))
+            v[j,i] = sqrt(data[i,j].velocity[1]^2+data[i,j].velocity[2]^2)
+            a[j,i] = sqrt(data[i,j].acceleration[1]^2+data[i,j].acceleration[2]^2)
         end
     end
     if type == "v" #dla v(t)
-        for i in 1:size(data)[2]
-            plot!(xs,v[1+(last_frame-first_frame+1)*(i-1):(last_frame-first_frame+1)*i],
+        for i in 1:size(v)[2]
+            plot!(xs,v[:,i],
             title = "v(t)",
-            xlabel = "t",
-            ylabel = "v(t)",
+            xlabel = "t[s]",
+            ylabel = "v(t)[m/s]",
             label = "Body $i")
         end
         savefig("v.png")
     elseif type == "a" #dla a(t)
-        for i in 1:size(data)[2]
-            plot!(xs,a[1+(last_frame-first_frame+1)*(i-1):(last_frame-first_frame+1)*i],
+        for i in 1:size(a)[2]
+            plot!(xs,a[:,i],
             title = "a(t)",
-            xlabel = "t",
-            ylabel = "a(t)",
+            xlabel = "t[s]",
+            ylabel = "a(t)[m/s]",
             label = "Body $i")
         end
         savefig("a.png")
@@ -85,5 +86,5 @@ end
 # r = run!(s)
 # graph(r,s,"a",[0,5]) #a(t)
 # graph(r,s,"v",[0,5]) #v(t)
-# draw(r,s) #<= wersja testowa dla sił; docelowo draw(s,limit)
-# test
+# draw(r,s,[-5,5,-5,5]) #<= wersja testowa dla sił; docelowo draw(s,limit)
+#test
