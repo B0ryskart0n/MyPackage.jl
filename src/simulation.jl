@@ -22,8 +22,8 @@ update(bodies::Matrix{Float64}, Δt::Float64) = begin
     forces_x = @. G * masses_product * Δxs / scalar
     forces_y = @. G * masses_product * Δys / scalar
 
-    bodies[7, :] = -transpose(sum(xforces, dims=1)) ./ masses # acceleration_x
-    bodies[8, :] = -transpose(sum(yforces, dims=1)) ./ masses # acceleration_y
+    bodies[7, :] = -transpose(sum(forces_x, dims=1)) ./ masses # acceleration_x
+    bodies[8, :] = -transpose(sum(forces_y, dims=1)) ./ masses # acceleration_y
     bodies[5, :] += bodies[7, :] .* Δt # velocity_x
     bodies[6, :] += bodies[8, :] .* Δt # velocity_y
     bodies[3, :] += bodies[5, :] .* Δt # position_x
