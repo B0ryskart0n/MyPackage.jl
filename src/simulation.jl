@@ -13,14 +13,14 @@ update(bodies::Matrix{Float64}, Δt::Float64) = begin
 
     xs = bodies[3, :]
     ys = bodies[4, :]
-    Δxs = transpose(x) .- x
-    Δys = transpose(y) .- y
+    Δxs = transpose(xs) .- xs
+    Δys = transpose(ys) .- ys
 
-    scalar = @. (xdiff ^2 + ydiff ^2) ^(3/2)
+    scalar = @. (Δxs ^2 + Δys ^2) ^(3/2)
     replace!(scalar, 0.0 => Inf) # because of division by 0 later
 
-    forces_x = @. G * masses_product * xdiff / scalar
-    forces_y = @. G * masses_product * ydiff / scalar
+    forces_x = @. G * masses_product * Δxs / scalar
+    forces_y = @. G * masses_product * Δys / scalar
 
     bodies[7, :] = -transpose(sum(xforces, dims=1)) ./ masses # acceleration_x
     bodies[8, :] = -transpose(sum(yforces, dims=1)) ./ masses # acceleration_y
