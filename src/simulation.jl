@@ -38,7 +38,7 @@ end
 Return the data of bodies collected in each frame of simulation.
 """
 run(bodies::Matrix{Float64}, timespan::Float64, Δt::Float64) = begin
-    num_of_frames = 1 + div(timespan, Δt) |> Int
+    num_of_frames = 1 + ceil(Int, timespan / Δt)
 
     data = Array{Float64, 3}(undef, size(bodies)[1], size(bodies)[2], num_of_frames)
 
