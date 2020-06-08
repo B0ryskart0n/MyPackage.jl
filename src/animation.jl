@@ -54,7 +54,7 @@ graph(data::Array{Float64, 3}, sim_time::Float64, type::String, time::Vector) = 
     v = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
     a = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
     for i in 1:size(data)[2]
-        for j in 1:last_frame-first_frame
+        for j in 1:last_frame-first_frame + 1
             v[i, j] = sqrt(data[5, i, j]^2+data[6, i, j]^2)
             a[i, j] = sqrt(data[7, i, j]^2+data[8, i, j]^2)
         end
