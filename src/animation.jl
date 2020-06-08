@@ -2,11 +2,11 @@ include("simulation.jl")
 using Plots
 
 """
-    draw(data::Array{Float64, 3}, gif_time::Float64) -> gif(a::Animation,::String,fps::Float64)
+    animate(data::Array{Float64, 3}, gif_time::Float64) -> gif(a::Animation,::String,fps::Float64)
 
 Makes and saves an animation as animation.gif.
 """
-draw(data::Array{Float64, 3}, gif_time::Float64) = begin
+animate(data::Array{Float64, 3}, gif_time::Float64) = begin
     num_of_frames = size(data)[3]
     r_max = maximum(data[2, :, :])
     x_min = minimum(data[3, :, :]) - r_max
@@ -39,7 +39,7 @@ end
 
 
 """
-    graph(data::Array{Body, 2}, Δt::Float64, type::String, time::Vector) -> savefig(::String)
+    graph(data::Array{Body, 2}, sim_time::Float64, type::String, time::Vector) -> savefig(::String)
 
 Makes and saves plots v(t) and a(t) as v.png and a.png.
 Acquires information what kind of plot to draw: "v" for v(t) and "a" for a(t).
@@ -64,7 +64,7 @@ graph(data::Array{Float64, 3}, sim_time::Float64, type::String, time::Vector) = 
             plot!(xs, v[i, :],
                 title = "v(t)",
                 xlabel = "t[s]",
-                ylabel = "v(t)[m/s]",
+                ylabel = "v[m/s]",
                 label = "Body $i")
         end
         savefig("v.png")
@@ -73,7 +73,7 @@ graph(data::Array{Float64, 3}, sim_time::Float64, type::String, time::Vector) = 
             plot!(xs, a[i, :],
                 title = "a(t)",
                 xlabel = "t[s]",
-                ylabel = "a(t)[m/s^2]",
+                ylabel = "a[m/s^2]",
                 label = "Body $i")
         end
         savefig("a.png")
@@ -82,13 +82,13 @@ end
 
 
 # test
-b = [1.5; 4.0; 5.0; 0.0; 0.5; 0.0; 0.0; 0.0]
-c = [100000000000.0; 8.0; 5.0; 5.0; 0.0; 0.0; 0.0; 0.0]
-bodies = [b c]
-Δt = 0.1
-t = 40.0
-r = run(bodies, t, Δt)
-graph(r, t,"a",[0,40]) #a(t)
-graph(r, t,"v",[0,40]) #v(t)
-draw(r, 10.0)
+# b = [1.5; 4.0; 5.0; 0.0; 0.5; 0.0; 0.0; 0.0]
+# c = [100000000000.0; 8.0; 5.0; 5.0; 0.0; 0.0; 0.0; 0.0]
+# bodies = [b c]
+# Δt = 0.1
+# t = 40.0
+# r = run(bodies, t, Δt)
+# graph(r, t,"a",[0,40]) #a(t)
+# graph(r, t,"v",[0,40]) #v(t)
+# animate(r, 10.0)
 #test
