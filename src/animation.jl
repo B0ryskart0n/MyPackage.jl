@@ -51,15 +51,14 @@ graph(data::Array{Float64, 3}, sim_time::Float64, type::String, time::Vector) = 
     last_frame = ceil(Int, all_frames * time[2] / sim_time)
     frames_to_plot = last_frame - first_frame + 1
     xs = LinRange(time[1], time[2], frames_to_plot)
-    v = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
-    a = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
-    for i in 1:size(data)[2]
-        for j in 1:last_frame-first_frame + 1
-            v[i, j] = sqrt(data[5, i, j]^2+data[6, i, j]^2)
-            a[i, j] = sqrt(data[7, i, j]^2+data[8, i, j]^2)
-        end
-    end
+
     if type == "v" #dla v(t)
+        v = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
+        for i in 1:size(data)[2]
+            for j in 1:last_frame-first_frame + 1
+                v[i, j] = sqrt(data[5, i, j]^2+data[6, i, j]^2)
+            end
+        end
         for i in 1:size(v)[1]
             plot!(xs, v[i, :],
                 title = "v(t)",
@@ -68,7 +67,14 @@ graph(data::Array{Float64, 3}, sim_time::Float64, type::String, time::Vector) = 
                 label = "Body $i")
         end
         savefig("v.png")
+
     elseif type == "a" #dla a(t)
+        a = Array{Float64,2}(undef,size(data)[2],frames_to_plot)
+        for i in 1:size(data)[2]
+            for j in 1:last_frame-first_frame + 1
+                a[i, j] = sqrt(data[7, i, j]^2+data[8, i, j]^2)
+            end
+        end
         for i in 1:size(a)[1]
             plot!(xs, a[i, :],
                 title = "a(t)",
