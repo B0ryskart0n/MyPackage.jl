@@ -26,4 +26,8 @@ Unfortunately Julia has some problems with high fps values. That means You canno
 
 #### When You check v(t) for example You will be asked to say when to start plotting and when to stop. It just means which time period You want to plot.
 
+Note that the timespan of Your plots must be contained in the timespan of the simulation.
+
 ## Congratulations, that's all! Now just click Start and give the program some time.
+
+#### If You want to plot or animate other situation click the Clear button.
