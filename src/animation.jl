@@ -2,11 +2,11 @@ include("simulation.jl")
 using Plots
 
 """
-    animate(data::Array{Float64, 3}, gif_time::Float64) -> gif(a::Animation,::String,fps::Float64)
+    simulate(data::Array{Float64, 3}, gif_time::Float64) -> gif(a::Animation,::String,fps::Float64)
 
 Makes and saves an animation as animation.gif.
 """
-animate(data::Array{Float64, 3}, gif_time::Float64) = begin
+simulate(data::Array{Float64, 3}, gif_time::Float64) = begin
     num_of_frames = size(data)[3]
     r_max = maximum(data[2, :, :])
     x_min = minimum(data[3, :, :]) - r_max
@@ -90,5 +90,5 @@ end
 # r = run(bodies, t, Δt)
 # graph(r, t,"a",[0,40]) #a(t)
 # graph(r, t,"v",[0,40]) #v(t)
-# animate(r, 10.0)
+# simulate(r, 10.0)
 #test
