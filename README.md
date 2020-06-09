@@ -2,6 +2,8 @@
 
 ## Welcome to the program for simulating the movement of celestial bodies!
 
+### Launch the main script by entering in Your terminal: 'julia MyPackage.jl'
+
 #### At the start You might want to check the Example button, it will do everything for You. Just give it a second.
 
 #### To start using the program we suggest taking a piece of paper to understand the initial conditions of Your simulation better.
