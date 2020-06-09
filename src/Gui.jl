@@ -1,7 +1,7 @@
 include("animation.jl")
 
 using Gtk,ImageView
-win = GtkWindow("Interaction of bodies",1800,900)
+win = GtkWindow("Interaction of bodies",1728,972)
 g = GtkGrid()
 
 #combobox
@@ -44,7 +44,7 @@ global initial_velocity_x_4 = GtkEntry(); set_gtk_property!(initial_velocity_x_4
 #buttons
 start = GtkButton("Start")
 example = GtkButton("Example")
-destroyAll = GtkButton("Destroy")
+destroyAll = GtkButton("Clear")
 
 #chechbuttons
 global v_od_t = GtkCheckButton()
@@ -74,7 +74,7 @@ global a_od_t_label = GtkLabel("a(t):")
 global info_label = GtkLabel("")
 global warning_label = GtkLabel("INFORMATIONS!")
 global warning_label_1 = GtkLabel(" Please be patient after pressing 'Start' or 'Example'.")
-global warning_label_2 = GtkLabel("If you want new animation or plots, please press 'Destroy' before'Start' or 'Example'.")
+global warning_label_2 = GtkLabel("If you want new animation or plots, please press 'Clear' before 'Start' or 'Example'.")
 global warning_label_3 = GtkLabel("Thank you.")
 
 # Now let's place these graphical elements into the Grid:
@@ -142,7 +142,7 @@ set_gtk_property!(g, :column_spacing, 10)  # introduce a 10-pixel gap between co
 set_gtk_property!(g, :row_spacing, 10) # introduce a 10-pixel gap between rows
 push!(win, g)
 showall(win)
-info_dialog("WELCOME!Welcome to the program for simulating the movement of celestial bodies. If You have any doubts about using the program check Readme.md")
+info_dialog("Welcome to the program for simulating the movement of celestial bodies. If You have any doubts about using the program check GitHub, ort README.md")
 
 function AddTime_1_Entry()
     """
@@ -391,7 +391,7 @@ function DoEverythink()
             end
         end
     catch
-        return error_dialog("Error!!! \nIncorerect data. Check the inputs!\n(Look for comas and charakters)")
+        return error_dialog("Error!!! \nIncorerect data. Check the inputs!\n(Look for commas and characters)")
     end
     global data = run(bodies,TIME_SIM,DELTA_T)
     simulate(data,TIME_ANIM)
