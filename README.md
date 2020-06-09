@@ -30,6 +30,6 @@ Unfortunately Julia has some problems with high fps values. That means You canno
 
 Note that the timespan of Your plots must be contained in the timespan of the simulation.
 
-## Congratulations, that's all! Now just click Start and give the program some time.
-
 #### If You want to plot or animate other situation click the Clear button.
+
+## Congratulations, that's all! Now just click Start and give the program some time.
