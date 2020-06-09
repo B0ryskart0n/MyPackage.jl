@@ -8,7 +8,7 @@ Makes and saves an animation as animation.gif.
 """
 simulate(data::Array{Float64, 3}, gif_time::Float64) = begin
     num_of_frames = size(data)[3]
-    r_max = maximum(data[2, :, :])
+    r_max = maximum(data[2, :, 1])
     x_min = minimum(data[3, :, :]) - r_max
     x_max = maximum(data[3, :, :]) + r_max
     y_min = minimum(data[4, :, :]) - r_max
