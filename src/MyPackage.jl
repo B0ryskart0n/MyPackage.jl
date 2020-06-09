@@ -1,7 +1,7 @@
 include("animation.jl")
 
 using Gtk,ImageView
-win = GtkWindow("Interaction of bodies",1728,972)
+win = GtkWindow("Interaction of bodies",1800,900)
 g = GtkGrid()
 
 #combobox
